@@ -24,7 +24,8 @@ async def create_notification(
         now = datetime.now(tzutc())
         delay_seconds = max(int((send_at - now).total_seconds()), 0)
         await send_notification(req.telegram_id, req.message, delay_seconds=delay_seconds)
-        notification = await NotificationRepository.add_one(session, req.model_dump())
+        data = {key: value for key, value in req.model_dump().items() if value is not None}
+        notification = await NotificationRepository.add_one(session, data)
         data = {
             "notification_id": notification.id,
             "delay_seconds": delay_seconds,

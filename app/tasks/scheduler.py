@@ -22,12 +22,12 @@ async def process_notifications():
                 if notif.repeat in REPEAT_DELTAS:
                     # Обновляем send_at на следующий раз, is_sent остаётся False
                     next_send = notif.send_at + REPEAT_DELTAS[notif.repeat]
-                    await NotificationRepository.update_one(session, notif.id, is_sent=True)  # помечаем как отправлен
+                    await NotificationRepository.update_get_id(session=session, filter_by={"id": notif.id}, update_data={"is_sent": True})  # помечаем как отправлен
                     # Сбросить is_sent и обновить send_at для повторяемых
                     notif.is_sent = False
                     notif.send_at = next_send
                     session.add(notif)
                     await session.commit()
                 else:
-                    await NotificationRepository.update_one(session, notif.id, is_sent=True)
+                    await NotificationRepository.update_get_id(session=session, filter_by={"id": notif.id}, update_data={"is_sent": True})
         await asyncio.sleep(30)  # Проверять каждые 30 секунд
